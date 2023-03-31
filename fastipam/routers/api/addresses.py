@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 from fastipam import crud, schemas
@@ -19,22 +19,29 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=list[schemas.Address])
+@router.get("/", response_model=list[schemas.Address], status_code=200)
 def get_all_addresses(
+    response: Response,
     skip: int | None = 0, 
     limit: int | None = 100, 
     db: Session = Depends(get_db)):
 
-    return crud.get_addresses(db, skip=skip, limit=limit)
+    if not (db_addresses := crud.get_addresses(db, skip=skip, limit=limit)):
+        response.status_code = status.HTTP_204_NO_CONTENT
+
+    return db_addresses
 
     
 @router.get("/{id}", response_model=schemas.Address)
 def get_address_by_id(id: int, db: Session = Depends(get_db)):
 
-    return crud.get_address_by_id(db, address_id=id)
+    if not (db_address := crud.get_address_by_id(db=db, address_id=id)):
+        raise HTTPException(404, detail="Address not found")
+
+    return db_address
 
 
-@router.post("/", response_model=schemas.Address)
+@router.post("/", response_model=schemas.Address, status_code=201)
 def create_address(
     address: schemas.AddressCreate,
     db: Session = Depends(get_db)):
