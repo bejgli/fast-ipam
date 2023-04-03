@@ -71,10 +71,10 @@ def create_subnet(
     return crud.create_subnet(db=db, subnet=subnet)
 
 
-#@router.get("/addresses", status_code=201)
-#def test_subnet(subnet: schemas.SubnetCreate):
-#    if 
-#    address_range = ip_network(subnet.ip_v4).hosts()
-#    print(address_range)
-#
-#    return address_range
+@router.delete("/{id}", status_code=204)
+def delete_subnet_by_id(id: int, db: Session = Depends(get_db)):
+
+    if not crud.get_subnet_by_id(db=db, subnet_id=id):
+        raise HTTPException(404, detail="Subnet not found")
+
+    return crud.delete_subnet_by_id(db=db, subnet_id=id)

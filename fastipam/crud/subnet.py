@@ -23,3 +23,10 @@ def get_subnet_by_id(db: Session, subnet_id: int):
 
 def get_subnet_by_name(db: Session, subnet_name: str):
     return db.query(models.Subnet).filter(models.Subnet.name == subnet_name).first()
+
+
+def delete_subnet_by_id(db: Session, subnet_id: int):
+    db_subnet = db.query(models.Subnet).filter(models.Subnet.id == subnet_id)
+    db_subnet.delete()
+    db.commit()
+    return db_subnet
