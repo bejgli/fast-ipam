@@ -39,8 +39,6 @@ def get_address_by_id(id: int, db: Session = Depends(get_db)):
 
 @router.post("/", response_model=schemas.Address, status_code=201)
 def create_address(address: schemas.AddressCreate, db: Session = Depends(get_db)):
-    # TODO
-
     if crud.get_address_by_name(db=db, address_name=address.name):
         raise HTTPException(status_code=400, detail="Name already used")
 
@@ -49,7 +47,12 @@ def create_address(address: schemas.AddressCreate, db: Session = Depends(get_db)
             status_code=400, detail=f"Subnet {address.subnet_id} doesn't exist"
         )
 
-    return crud.create_address(db=db, address=address, subnet=subnet)
+    if not (db_address := crud.create_address(db=db, address=address, subnet=subnet)):
+        raise HTTPException(
+            status_code=400, detail=f"Subnet {address.subnet_id} is full"
+        )  # TODO Maybe raise in crud, except here
+
+    return db_address
 
 
 @router.delete("/{id}", status_code=204)

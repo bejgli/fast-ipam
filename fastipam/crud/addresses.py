@@ -6,26 +6,37 @@ from fastipam import models, schemas
 
 
 # Utils
-def get_first_diff(values: list[str], reference: list[IPv4Address | IPv6Address]):
+def get_first_free(
+    values: list[IPv4Address | IPv6Address], reference: list[IPv4Address | IPv6Address]
+) -> str | None:
+    """Find the first available address in a subnet,
+    by sorting the used addresses and comparing them to the valid ones.
+
+    Args:
+        values (list[IPv4Address  |  IPv6Address]): List of available IP addresses.
+        reference (list[IPv4Address  |  IPv6Address]): List of used IP addresses.
+
+    Returns:
+        str | None: First available address in exploded form or None.
+    """
     for v, r in zip_longest(values, sorted(reference)):
-        print(f"v:{v} ------ u:{r}")
-        if v != str(r):
-            return v
-    return None #TODO MAaybe raise here
+        if v != r:
+            return v.exploded
+    return None  # TODO ERROR HANDLING Maybe raise error here
 
 
-def create_address(
-    db: Session, address: schemas.AddressCreate, subnet: models.Subnet
-):
+def create_address(db: Session, address: schemas.AddressCreate, subnet: models.Subnet):
     # TODO Create host with specified address. if address -> check available -> create
+    # TODO Check if address is either ipv4 or ipv6 -> Now ipv4 is hardcoded
     used_hosts = [ip_address(addr.ip_v4) for addr in subnet.addresses]
-    valid_hosts = [addr.exploded for addr in ip_network(str(subnet.ip_v4)).hosts()]
+    valid_hosts = [addr for addr in ip_network(str(subnet.ip_v4)).hosts()]
 
-    first_addr = get_first_diff(valid_hosts, used_hosts)
+    first_addr = get_first_free(valid_hosts, used_hosts)
 
     if not first_addr:
-        return "No free address"  # TODO error handling
+        return None  # TODO ERROR HANDLING Maybe raise here and catch in route
 
+    # TODO Check if address is either ipv4 or ipv6
     db_address = models.Address(**address.dict(), ip_v4=first_addr)
 
     db.add(db_address)
