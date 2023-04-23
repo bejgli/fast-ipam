@@ -1,3 +1,4 @@
+dev_utils/
 *.db
 .vscode/
 # Byte-compiled / optimized / DLL files
