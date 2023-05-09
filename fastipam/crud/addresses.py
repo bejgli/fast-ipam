@@ -64,3 +64,16 @@ def delete_host_by_id(db: Session, host_id: int):
     db.commit()
 
     return db_host
+
+
+def update_host(db: Session, host: schemas.HostUpdate, host_id: int):
+    db_host = db.query(models.Address).filter(models.Address.id == host_id).first()
+
+    # Update only if values are not None 
+    for k, v in host.dict().items():
+        if v:
+            setattr(db_host, k, v)
+    
+    db.commit()
+
+    return db_host

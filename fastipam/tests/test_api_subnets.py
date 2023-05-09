@@ -12,7 +12,7 @@ def test_read_nonexistent_subnets():
 
 
 def test_create_ipv4_subnet(
-    json = {
+    json={
         "ip_v4": "192.168.0.0/24",
         "mask": "mask",
         "name": "api_test_subnet",
@@ -25,7 +25,7 @@ def test_create_ipv4_subnet(
 
 
 def test_create_bad_name_subnet(
-    json = {
+    json={
         "ip_v4": "192.168.1.0/24",
         "mask": "mask",
         "name": "api_test_subnet",
@@ -43,8 +43,9 @@ def test_read_subnet_by_id():
 
     assert response.status_code == 200
 
+
 def test_create_host(
-    json = {
+    json={
         "name": "api_test_subnet",
         "description": "string",
         "subnet_id": 1,
@@ -53,6 +54,18 @@ def test_create_host(
     response = client.post("/addresses/", json=json)
 
     assert response.status_code == 201
+
+
+def test_update_host(
+    json={
+        "name": "new name",
+        "description": "new description",
+    }
+):
+    id = 1
+    response = client.patch(f"/addresses/{id}", json=json)
+
+    assert response.status_code == 200
 
 
 def test_delete_host():
