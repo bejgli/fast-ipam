@@ -21,9 +21,14 @@ def get_all_addresses(
     response: Response,
     skip: int | None = 0,
     limit: int | None = 100,
+    subnet: str | None = None,
     db: Session = Depends(get_db),
 ):
-    if not (db_addresses := crud.get_addresses(db, skip=skip, limit=limit)):
+    if not (
+        db_addresses := crud.get_addresses(
+            db, skip=skip, limit=limit, subnet_name=subnet
+        )
+    ):
         response.status_code = status.HTTP_204_NO_CONTENT
 
     return db_addresses
