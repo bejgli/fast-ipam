@@ -19,8 +19,8 @@ router = APIRouter(prefix="/addresses", tags=["addresses"])
 @router.get("/", response_model=list[schemas.Address], status_code=200)
 def get_all_addresses(
     response: Response,
-    skip: int | None = 0,
-    limit: int | None = 100,
+    skip: int | None = None,
+    limit: int | None = None,
     subnet: str | None = None,
     db: Session = Depends(get_db),
 ):
