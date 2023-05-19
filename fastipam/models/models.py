@@ -38,13 +38,13 @@ class Section(Base):
     # subnets should be unique
     # subnets should not overlap -> calculate overlaps
 
+
 class Subnet(Base):
     __tablename__ = "subnet"
 
     id = Column(Integer, primary_key=True, index=True)
 
-    ip_v4 = Column(String, index=True)
-    ip_v6 = Column(String, index=True)
+    ip = Column(String, index=True)
     name = Column(String, unique=False, index=True)
     description = Column(String, index=False)
     location = Column(String, index=True)
@@ -63,8 +63,7 @@ class Host(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
-    ip_v4 = Column(Integer, index=True)
-    ip_v6 = Column(Integer, index=True)
+    ip = Column(Integer, index=True)
     name = Column(String, unique=True, index=True)
     description = Column(String, index=False)
 

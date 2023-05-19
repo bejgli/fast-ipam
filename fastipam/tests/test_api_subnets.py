@@ -13,7 +13,7 @@ def test_read_nonexistent_subnets():
 
 def test_create_ipv4_subnet(
     json={
-        "ip_v4": "192.168.0.0/24",
+        "ip": "192.168.0.0/24",
         "name": "api_test_subnet",
         "description": "string",
         "location": "westeu",
@@ -27,7 +27,7 @@ def test_create_ipv4_subnet(
 
 def test_create_bad_name_subnet(
     json={
-        "ip_v4": "192.168.1.0/24",
+        "ip": "192.168.1.0/24",
         "name": "api_test_subnet",
         "description": "string",
         "location": "westeu",

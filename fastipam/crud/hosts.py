@@ -28,8 +28,8 @@ def get_first_free(
 def create_host(db: Session, host: schemas.HostCreate, subnet: models.Subnet):
     # TODO Create host with specified address. if address -> check available -> create
     # TODO Check if address is either ipv4 or ipv6 -> Now ipv4 is hardcoded
-    used_hosts = [ip_address(addr.ip_v4) for addr in subnet.hosts]
-    valid_hosts = [addr for addr in ip_network(str(subnet.ip_v4)).hosts()]
+    used_hosts = [ip_address(host.ip) for host in subnet.hosts]
+    valid_hosts = [host for host in ip_network(str(subnet.ip)).hosts()]
 
     first_addr = get_first_free(valid_hosts, used_hosts)
 
@@ -37,7 +37,7 @@ def create_host(db: Session, host: schemas.HostCreate, subnet: models.Subnet):
         return None  # TODO ERROR HANDLING Maybe raise here and catch in route
 
     # TODO Check if address is either ipv4 or ipv6
-    db_host = models.Host(**host.dict(), ip_v4=first_addr)
+    db_host = models.Host(**host.dict(), ip=first_addr)
 
     db.add(db_host)
     db.commit()
