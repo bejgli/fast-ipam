@@ -1,16 +1,16 @@
 from pydantic import BaseModel
 
-class AddressBase(BaseModel):
+class HostBase(BaseModel):
     name: str
     description: str | None = None
 
-class AddressCreate(AddressBase):
+class HostCreate(HostBase):
     subnet_id: int
 
-class HostUpdate(AddressBase):
+class HostUpdate(HostBase):
     name: str | None
 
-class Address(AddressBase):
+class Host(HostBase):
     id: int
     ip_v4: str | None = None
     ip_v6: str | None = None

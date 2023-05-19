@@ -25,7 +25,7 @@ def get_first_free(
     return None  # TODO ERROR HANDLING Maybe raise error here
 
 
-def create_address(db: Session, address: schemas.AddressCreate, subnet: models.Subnet):
+def create_host(db: Session, host: schemas.HostCreate, subnet: models.Subnet):
     # TODO Create host with specified address. if address -> check available -> create
     # TODO Check if address is either ipv4 or ipv6 -> Now ipv4 is hardcoded
     used_hosts = [ip_address(addr.ip_v4) for addr in subnet.hosts]
@@ -37,20 +37,20 @@ def create_address(db: Session, address: schemas.AddressCreate, subnet: models.S
         return None  # TODO ERROR HANDLING Maybe raise here and catch in route
 
     # TODO Check if address is either ipv4 or ipv6
-    db_address = models.Host(**address.dict(), ip_v4=first_addr)
+    db_host = models.Host(**host.dict(), ip_v4=first_addr)
 
-    db.add(db_address)
+    db.add(db_host)
     db.commit()
-    db.refresh(db_address)
+    db.refresh(db_host)
 
-    return db_address
+    return db_host
 
 
-def get_addresses(
+def get_hosts(
     db: Session, skip: int | None, limit: int | None, subnet_name: str | None
 ):
     if subnet_name:
-        db_addresses = (
+        db_hosts = (
             db.query(models.Host)
             .join(models.Host.subnet)
             .filter(models.Subnet.name == subnet_name)
@@ -58,19 +58,19 @@ def get_addresses(
             .limit(limit)
         )
     else:
-        db_addresses = db.query(models.Host).offset(skip).limit(limit)
-    return db_addresses.all()
+        db_hosts = db.query(models.Host).offset(skip).limit(limit)
+    return db_hosts.all()
 
 
-def get_address_by_id(db: Session, address_id: int):
-    return db.query(models.Host).filter(models.Host.id == address_id).first()
+def get_host_by_id(db: Session, host_id: int):
+    return db.query(models.Host).filter(models.Host.id == host_id).first()
 
 
-def get_address_by_name(db: Session, address_name: str):
-    return db.query(models.Host).filter(models.Host.name == address_name).first()
+def get_host_by_name(db: Session, host_name: str):
+    return db.query(models.Host).filter(models.Host.name == host_name).first()
 
 
-def delete_host_by_id(db: Session, host_id: int):
+def delete_host(db: Session, host_id: int):
     db_host = db.query(models.Host).filter(models.Host.id == host_id)
     db_host.delete()
     db.commit()
