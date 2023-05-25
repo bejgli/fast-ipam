@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
+from ipaddress import ip_address
 
 class HostBase(BaseModel):
     name: str
@@ -12,8 +13,7 @@ class HostUpdate(HostBase):
 
 class Host(HostBase):
     id: int
-    ip_v4: str | None = None
-    ip_v6: str | None = None
+    ip: str
     subnet_id: int
 
     class Config:
