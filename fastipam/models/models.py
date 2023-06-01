@@ -12,7 +12,6 @@ class User(Base):
 
     username = Column(String, unique=True, index=True)
     password = Column(String)
-    #salt
     email = Column(String, unique=True, index=True)
     
     role = Column(String, default="Read")

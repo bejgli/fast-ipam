@@ -4,15 +4,7 @@ from sqlalchemy.orm import Session
 from ipaddress import ip_network, IPv4Address, IPv6Address
 
 from fastipam import crud, schemas
-from fastipam.database import SessionLocal
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+from fastipam.dependencies import get_db
 
 
 router = APIRouter(prefix="/subnets", tags=["subnets"])

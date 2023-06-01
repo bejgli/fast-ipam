@@ -1,36 +1,30 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status, Request
+
 from sqlalchemy.orm import Session
+from typing import Annotated
 
 from fastipam import crud, schemas
-from fastipam.database import SessionLocal
+from fastipam.dependencies import get_db, oauth2_scheme
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+router = APIRouter(
+    prefix="/hosts", tags=["hosts"]
+)
 
 
-router = APIRouter(prefix="/hosts", tags=["hosts"])
-
-
-@router.get("/", response_model=list[schemas.Host], status_code=200)
+@router.get("/", response_model=list[schemas.Host], status_code=201)
 def get_all_hosts(
     response: Response,
+    request: Request,
     skip: int | None = None,
     limit: int | None = None,
     subnet: str | None = None,
     db: Session = Depends(get_db),
 ):
-    if not (
-        db_hosts := crud.get_hosts(
-            db, skip=skip, limit=limit, subnet_name=subnet
-        )
-    ):
+    if not (db_hosts := crud.get_hosts(db, skip=skip, limit=limit, subnet_name=subnet)):
         response.status_code = status.HTTP_204_NO_CONTENT
-
+    
+    print(request.client)
     return db_hosts
 
 
