@@ -9,6 +9,7 @@ from fastipam import models, crud, schemas
 from fastipam.database import SessionLocal
 from fastipam.security import SECRET_KEY, ALGORITHM
 
+
 def get_db():
     db = SessionLocal()
     try:
@@ -17,16 +18,14 @@ def get_db():
         db.close()
 
 
-
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 
 def get_current_user(
     db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
 ) -> models.User:
     try:
-        payload = jwt.decode(
-            token, SECRET_KEY, algorithms=[ALGORITHM]
-        )
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         token_data = schemas.TokenPayload(**payload)
     except (JWTError, ValidationError):
         raise HTTPException(

@@ -87,5 +87,6 @@ def update_host(db: Session, host: schemas.HostUpdate, host_id: int):
             setattr(db_host, k, v)
 
     db.commit()
+    db.refresh(db_host)
 
     return db_host

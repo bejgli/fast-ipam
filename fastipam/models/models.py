@@ -13,7 +13,7 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     password = Column(String)
     email = Column(String, unique=True, index=True)
-    
+
     role = Column(String, default="Read")
     date_created = Column(DateTime, default=datetime.now)
     date_updated = Column(DateTime, default=datetime.now, onupdate=datetime.now)
@@ -27,13 +27,13 @@ class Section(Base):
     name = Column(String, unique=True, index=True)
     description = Column(String, index=False)
 
-    #subnets = relationship(
+    # subnets = relationship(
     #    "Subnet",
     #    cascade="all, delete, delete-orphan",
     #    back_populates="subnet",
     #    passive_deletes=True,
-    #)
-    
+    # )
+
     # subnets should be unique
     # subnets should not overlap -> calculate overlaps
 
