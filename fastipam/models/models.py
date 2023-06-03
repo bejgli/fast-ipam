@@ -1,6 +1,6 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
-from sqlalchemy.orm import relationship
+from sqlalchemy import Integer, String, ForeignKey, DateTime
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 from fastipam.database import Base
 
@@ -8,24 +8,26 @@ from fastipam.database import Base
 class User(Base):
     __tablename__ = "user"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
 
-    username = Column(String, unique=True, index=True)
-    password = Column(String)
-    email = Column(String, unique=True, index=True)
+    username: Mapped[str] = mapped_column(String, unique=True, index=True)
+    password: Mapped[str] = mapped_column(String)
+    email: Mapped[str] = mapped_column(String, unique=True, index=True)
 
-    role = Column(String, default="Read")
-    date_created = Column(DateTime, default=datetime.now)
-    date_updated = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    role: Mapped[str] = mapped_column(String, default="Read")
+    date_created: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now)
+    date_updated: Mapped[DateTime] = mapped_column(
+        DateTime, default=datetime.now, onupdate=datetime.now
+    )
 
 
 class Section(Base):
     __tablename__ = "section"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
 
-    name = Column(String, unique=True, index=True)
-    description = Column(String, index=False)
+    name: Mapped[str] = mapped_column(String, unique=True, index=True)
+    description: Mapped[str] = mapped_column(String, index=False)
 
     # subnets = relationship(
     #    "Subnet",
@@ -41,30 +43,28 @@ class Section(Base):
 class Subnet(Base):
     __tablename__ = "subnet"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
 
-    ip = Column(String, index=True)
-    name = Column(String, unique=False, index=True)
-    description = Column(String, index=False)
-    location = Column(String, index=True)
-    threshold = Column(Integer, index=False)
+    ip: Mapped[str] = mapped_column(String, index=True)
+    name: Mapped[str] = mapped_column(String, unique=False, index=True)
+    description: Mapped[str | None]
+    location: Mapped[str | None] 
+    threshold: Mapped[int] = mapped_column(Integer)
 
-    hosts = relationship(
-        "Host",
-        cascade="all, delete, delete-orphan",
+    hosts: Mapped[list["Host"]] = relationship(
         back_populates="subnet",
-        passive_deletes=True,
+        cascade="all, delete-orphan",
     )
 
 
 class Host(Base):
     __tablename__ = "host"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 
-    ip = Column(Integer, index=True)
-    name = Column(String, unique=True, index=True)
-    description = Column(String, index=False)
+    ip: Mapped[int] = mapped_column(Integer, index=True)
+    name: Mapped[str] = mapped_column(String, unique=True, index=True)
+    description: Mapped[str | None] 
 
-    subnet_id = Column(Integer, ForeignKey("subnet.id", ondelete="CASCADE"))
-    subnet = relationship("Subnet", back_populates="hosts")
+    subnet_id: Mapped[int] = mapped_column(ForeignKey("subnet.id"))
+    subnet: Mapped["Subnet"] = relationship(back_populates="hosts")

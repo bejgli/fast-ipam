@@ -12,7 +12,7 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=list[schemas.Host], status_code=201)
+@router.get("/", response_model=list[schemas.Host], status_code=200)
 def get_all_hosts(
     response: Response,
     request: Request,
@@ -24,7 +24,7 @@ def get_all_hosts(
     if not (db_hosts := crud.get_hosts(db, skip=skip, limit=limit, subnet_name=subnet)):
         response.status_code = status.HTTP_204_NO_CONTENT
     
-    print(request.client)
+    #print(request.client)
     return db_hosts
 
 

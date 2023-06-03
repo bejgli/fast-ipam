@@ -75,7 +75,7 @@ def delete_host(db: Session, host_id: int):
     db_host.delete()
     db.commit()
 
-    return db_host
+    return None
 
 
 def update_host(db: Session, host: schemas.HostUpdate, host_id: int):

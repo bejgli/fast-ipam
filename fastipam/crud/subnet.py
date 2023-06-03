@@ -15,7 +15,7 @@ def check_subnet_conflict(new_subnet: IPv4Network | IPv6Network, existing_subnet
 
 
 def create_subnet(db: Session, subnet: schemas.SubnetCreate):
-    existing_subs = db.query(models.Subnet).options(load_only(models.Subnet.ip)).all()  # type: ignore
+    existing_subs = db.query(models.Subnet).options(load_only(models.Subnet.ip)).all() 
 
     if check_subnet_conflict(ip_network(subnet.ip), existing_subs):
         return None
@@ -42,7 +42,8 @@ def get_subnet_by_name(db: Session, subnet_name: str):
 
 
 def delete_subnet_by_id(db: Session, subnet_id: int):
-    db_subnet = db.query(models.Subnet).filter(models.Subnet.id == subnet_id)
-    db_subnet.delete()
+    db_subnet = db.get(models.Subnet, subnet_id)
+    db.delete(db_subnet)
     db.commit()
-    return db_subnet
+    
+    return None
