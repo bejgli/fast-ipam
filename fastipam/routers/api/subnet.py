@@ -47,4 +47,16 @@ def delete_subnet_by_id(id: int, db: Session = Depends(get_db)):
     if not crud.get_subnet_by_id(db=db, subnet_id=id):
         raise HTTPException(404, detail="Subnet not found")
 
-    return crud.delete_subnet_by_id(db=db, subnet_id=id)
+    return crud.delete_subnet(db=db, subnet_id=id)
+
+
+@router.patch("/{id}", response_model=schemas.Subnet, status_code=200)
+def update_subnet(id: int, subnet: schemas.SubnetUpdate, db: Session = Depends(get_db)):
+    if not crud.get_subnet_by_id(db=db, subnet_id=id):
+        raise HTTPException(404, detail="Subnet not found")
+
+    # Unique name check
+    if subnet.name and crud.get_subnet_by_name(db=db, subnet_name=subnet.name):
+        raise HTTPException(status_code=400, detail="Name already used")
+
+    return crud.update_subnet(db=db, subnet_id=id, subnet=subnet)

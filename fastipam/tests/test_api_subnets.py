@@ -39,6 +39,20 @@ def test_create_bad_name_subnet(
     assert response.status_code == 400
 
 
+def test_update_subnet(
+    json={
+        "name": "updated_subnet_name",
+        "description": "updated_description",
+        "location": "easteu",
+        "threshold": 50,
+    }
+):
+    id = 1
+    response = client.patch(f"/subnets/{id}", json=json)
+
+    assert response.status_code == 200
+
+
 def test_read_subnet_by_id():
     id = 1
     response = client.get(f"/subnets/{id}")
@@ -48,7 +62,7 @@ def test_read_subnet_by_id():
 
 def test_create_host(
     json={
-        "name": "api_test_subnet",
+        "name": "api_test_host",
         "description": "string",
         "subnet_id": 1,
     }

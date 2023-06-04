@@ -4,11 +4,13 @@ from ipaddress import IPv4Network, IPv6Network, IPv4Address, IPv6Address, ip_net
 from .host import Host
 
 class SubnetBase(BaseModel):
-    ip: str
     name: str
     description: str | None = None
     location: str | None = None
     threshold: int = Field(0, ge=0, le=100)
+
+class SubnetCreate(SubnetBase):
+    ip: str
 
     @validator("ip")
     def check_ip(cls, v):
@@ -16,14 +18,13 @@ class SubnetBase(BaseModel):
             ip_network(v)
         return v
 
-
-class SubnetCreate(SubnetBase):
+class SubnetUpdate(SubnetBase):
+    name: str | None
     pass
-
 
 class Subnet(SubnetBase):
     id: int
-
+    ip: str
     hosts: list[Host] = []
 
     class Config:
