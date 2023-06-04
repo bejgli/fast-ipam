@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from fastipam.routers.api import hosts, subnet, users, login
+from fastipam.routers import api, ui
 
 title="FastIPAM"
 description="Compact IPAM created with FastAPI."
@@ -14,9 +14,11 @@ app = FastAPI(
 )
 
 
-app.include_router(hosts.router)
-app.include_router(subnet.router)
-app.include_router(users.router)
-app.include_router(login.router)
+app.include_router(api.hosts.router)
+app.include_router(api.subnet.router)
+app.include_router(api.users.router)
+app.include_router(api.login.router)
+
+app.include_router(ui.login.router)
 
 

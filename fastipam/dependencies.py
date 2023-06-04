@@ -32,8 +32,40 @@ def get_current_user(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
         )
-    user = crud.users.get_user_by_id(db, id=token_data.sub)
+    user = crud.users.get_user_by_id(db, user_id=token_data.sub)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
     return user
+
+
+def get_current_active_user(
+    current_user: models.User = Depends(get_current_user),
+) -> models.User:
+    if not current_user.active:
+        raise HTTPException(status_code=403, detail="Inactive user")
+
+    return current_user
+
+
+def get_current_active_opuser(
+    current_user: models.User = Depends(get_current_active_user),
+) -> models.User:
+    if not current_user.operator or not current_user.superuser:
+        raise HTTPException(
+            status_code=403,
+            detail="Insufficient privileges. Operator permission required.",
+        )
+
+    return current_user
+
+
+def get_current_active_superuser(
+    current_user: models.User = Depends(get_current_active_user),
+) -> models.User:
+    if not current_user.superuser:
+        raise HTTPException(
+            status_code=403, detail="Insufficient privileges. Superuser required."
+        )
+
+    return current_user

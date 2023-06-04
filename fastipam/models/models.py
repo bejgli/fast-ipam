@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Integer, String, ForeignKey, DateTime
+from sqlalchemy import Integer, String, ForeignKey, DateTime, Boolean
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 from fastipam.database import Base
@@ -14,7 +14,9 @@ class User(Base):
     password: Mapped[str] = mapped_column(String)
     email: Mapped[str] = mapped_column(String, unique=True, index=True)
 
-    role: Mapped[str] = mapped_column(String, default="Read")
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
+    operator: Mapped[bool] = mapped_column(Boolean, default=False)
+    superuser: Mapped[bool] = mapped_column(Boolean, default=False)
     date_created: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now)
     date_updated: Mapped[DateTime] = mapped_column(
         DateTime, default=datetime.now, onupdate=datetime.now

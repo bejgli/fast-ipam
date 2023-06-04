@@ -1,7 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Response, status
-from fastapi.exception_handlers import request_validation_exception_handler
 from sqlalchemy.orm import Session
-from ipaddress import ip_network, IPv4Address, IPv6Address
 
 from fastipam import crud, schemas
 from fastipam.dependencies import get_db
@@ -43,7 +41,7 @@ def create_subnet(subnet: schemas.SubnetCreate, db: Session = Depends(get_db)):
 
 
 @router.delete("/{id}", status_code=204)
-def delete_subnet_by_id(id: int, db: Session = Depends(get_db)):
+def delete_subnet(id: int, db: Session = Depends(get_db)):
     if not crud.get_subnet_by_id(db=db, subnet_id=id):
         raise HTTPException(404, detail="Subnet not found")
 

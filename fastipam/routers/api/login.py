@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 
 from sqlalchemy.orm import Session
@@ -26,8 +26,8 @@ def login_access_token(
         db, email=form_data.username, password=form_data.password
     )
     if not db_user:
-        raise HTTPException(status_code=400, detail="Incorrect email or password")
-    access_token_expires = timedelta(minutes=1)
+        raise HTTPException(status_code=401, detail="Incorrect email or password")
+    access_token_expires = timedelta(minutes=45)
 
     return {
         "access_token": create_access_token(

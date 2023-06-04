@@ -14,4 +14,13 @@ from .subnet import (
     delete_subnet,
     update_subnet,
 )
-from .users import create_user, get_user_by_name, get_user_by_email, authenticate_user
+from .users import (
+    create_user,
+    get_users,
+    get_user_by_id,
+    get_user_by_name,
+    get_user_by_email,
+    delete_user,
+    update_user,
+    authenticate_user,
+)

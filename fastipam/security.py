@@ -6,7 +6,7 @@ from jose import jwt
 
 
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
+ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 SECRET_KEY: str = secrets.token_urlsafe(32)
 
 
