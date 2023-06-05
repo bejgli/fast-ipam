@@ -10,7 +10,7 @@ class Settings(BaseSettings):
 
     SUPERUSER: str = Field(default="admin")
     SUPERUSER_EMAIL: EmailStr = Field(default="admin@example.com")
-    SUPERUSER_PASSWORD: SecretStr = Field(default="123")
+    SUPERUSER_PASSWORD: SecretStr = Field(default="admin")
 
     class Config:
         case_sensitive = True

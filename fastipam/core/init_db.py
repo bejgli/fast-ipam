@@ -1,3 +1,5 @@
+import logging
+
 from sqlalchemy.orm import Session
 
 from fastipam import crud, schemas
@@ -12,8 +14,7 @@ def create_initial_superuser(
         return
 
     if crud.get_user_by_email(db=db, email=settings.SUPERUSER_EMAIL):
-        return 
-
+        return
     user = schemas.UserCreate(
         username=settings.SUPERUSER,
         email=settings.SUPERUSER_EMAIL,
@@ -27,5 +28,10 @@ def create_initial_superuser(
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+
+    logger.info("Creating initial superuser.")
     db = SessionLocal()
     create_initial_superuser(db=db)
+    logger.info("Done")
