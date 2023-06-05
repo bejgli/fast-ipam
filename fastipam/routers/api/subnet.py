@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
+from ipaddress import ip_network
 
 from fastipam import crud, schemas
 from fastipam.dependencies import get_db
@@ -34,10 +35,50 @@ def create_subnet(subnet: schemas.SubnetCreate, db: Session = Depends(get_db)):
     if crud.get_subnet_by_name(db=db, subnet_name=subnet.name):
         raise HTTPException(status_code=400, detail="Name already used")
 
-    if not (db_subnet := crud.create_subnet(db=db, subnet=subnet)):
-        raise HTTPException(status_code=400, detail="Subnet conflict")
+    # Convert subnet into ipnetwork object for later
+    subnet_netw_obj = ip_network(subnet.ip)
+    if subnet.supernet:
+        if not (db_supernet := crud.get_subnet_by_id(db, subnet.supernet)):
+            raise HTTPException(status_code=400, detail="Supernet doesn't exist")
 
-    return db_subnet
+        # Check if supernet is valid (overlaps subnet and versions match)
+        try:
+            if not (ip_network(db_supernet.ip)).supernet_of(subnet_netw_obj):  # type: ignore
+                raise HTTPException(
+                    status_code=400,
+                    detail="Selected supernet is not supernet of this subnet",
+                )
+        # TypeError happens when ip versions don't match
+        except TypeError:
+            raise HTTPException(
+                status_code=400,
+                detail="Supernet and subnet IP versions don't match",
+            )
+
+    # Check for overlapping subnets excluding supernet
+    # IP versions already checked, type can be ignored
+    db_subnets = crud.get_subnets_by_version(
+        db=db, subnet_version=subnet_netw_obj.version
+    )
+
+    for db_subnet in db_subnets:
+        db_subnet = ip_network(db_subnet.ip)
+        if subnet.supernet:
+            if subnet_netw_obj.overlaps(db_subnet) and db_subnet != ip_network(db_supernet.ip):  # type: ignore
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Subnet conflicts with {db_subnet.exploded}",
+                )
+        else:
+            if subnet_netw_obj.overlaps(db_subnet):
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Subnet conflicts with {db_subnet.exploded}",
+                )
+
+    return crud.create_subnet(
+        db=db, subnet=subnet, subnet_version=subnet_netw_obj.version
+    )
 
 
 @router.delete("/{id}", status_code=204)

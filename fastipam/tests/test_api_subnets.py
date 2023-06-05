@@ -39,6 +39,22 @@ def test_create_bad_name_subnet(
     assert response.status_code == 400
 
 
+def test_create_subnet_with_supernet(
+    json={"ip": "192.168.0.0/26", "name": "nested_subnet", "supernet": 1}
+):
+    response = client.post("/subnets/", json=json)
+
+    assert response.status_code == 201
+
+
+def test_mismatch_subnet_versions(
+    json={"ip": "fe80::1234", "name": "mismatch_versions", "supernet": 1}
+):
+    response = client.post("/subnets/", json=json)
+
+    assert response.status_code == 400
+
+
 def test_update_subnet(
     json={
         "name": "updated_subnet_name",
@@ -100,6 +116,11 @@ def test_read_subnet_by_bad_id():
 
 def test_delete_subnet():
     id = 1
+    response = client.delete(f"/subnets/{id}")
+
+    assert response.status_code == 204
+
+    id = 2
     response = client.delete(f"/subnets/{id}")
 
     assert response.status_code == 204

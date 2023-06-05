@@ -1,3 +1,4 @@
+from sqlalchemy import select
 from sqlalchemy.orm import Session, load_only
 from ipaddress import ip_network, ip_address, IPv4Network, IPv6Network
 from fastipam import models, schemas
@@ -7,20 +8,10 @@ from fastipam import models, schemas
 #    return db.query(models.Subnet).options(load_only(models.Subnet.ip)).all() # type: ignore
 
 
-def check_subnet_conflict(new_subnet: IPv4Network | IPv6Network, existing_subnets):
-    for subnet in existing_subnets:
-        if new_subnet.overlaps(ip_network(subnet.ip)):
-            return True  # TODO: Return conflicting IP
-    return False
-
-
-def create_subnet(db: Session, subnet: schemas.SubnetCreate):
-    existing_subs = db.query(models.Subnet).options(load_only(models.Subnet.ip)).all()
-
-    if check_subnet_conflict(ip_network(subnet.ip), existing_subs):
-        return None
-
-    db_subnet = models.Subnet(**subnet.dict())
+def create_subnet(
+    db: Session, subnet: schemas.SubnetCreate, subnet_version: int
+) -> models.Subnet | None:
+    db_subnet = models.Subnet(**subnet.dict(), version=subnet_version)
 
     db.add(db_subnet)
     db.commit()
@@ -31,6 +22,15 @@ def create_subnet(db: Session, subnet: schemas.SubnetCreate):
 
 def get_subnets(db: Session, skip: int | None, limit: int | None):
     return db.query(models.Subnet).offset(skip).limit(limit).all()
+
+
+def get_subnets_by_version(db: Session, subnet_version: int) -> list[models.Subnet]:
+    return (
+        db.query(models.Subnet)
+        .filter(models.Subnet.version == subnet_version)
+        .options(load_only(models.Subnet.ip))
+        .all()
+    )
 
 
 def get_subnet_by_id(db: Session, subnet_id: int):

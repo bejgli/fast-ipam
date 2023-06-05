@@ -48,10 +48,12 @@ class Subnet(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
 
     ip: Mapped[str] = mapped_column(String, index=True)
+    version: Mapped[int] = mapped_column(Integer, index=True)
     name: Mapped[str] = mapped_column(String, unique=False, index=True)
     description: Mapped[str | None]
     location: Mapped[str | None] 
     threshold: Mapped[int] = mapped_column(Integer)
+    supernet: Mapped[int | None] = mapped_column(Integer)
 
     hosts: Mapped[list["Host"]] = relationship(
         back_populates="subnet",
@@ -64,7 +66,7 @@ class Host(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 
-    ip: Mapped[int] = mapped_column(Integer, index=True)
+    ip: Mapped[int] = mapped_column(Integer, index=True) # WHAT ? INTEGER? # TODO: WTF
     name: Mapped[str] = mapped_column(String, unique=True, index=True)
     description: Mapped[str | None] 
 

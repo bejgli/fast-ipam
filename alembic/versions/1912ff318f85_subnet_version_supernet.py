@@ -1,8 +1,8 @@
-"""updated
+"""subnet version, supernet
 
-Revision ID: e8921a3ab854
+Revision ID: 1912ff318f85
 Revises: 
-Create Date: 2023-06-03 19:51:59.975506
+Create Date: 2023-06-05 18:10:33.595687
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'e8921a3ab854'
+revision = '1912ff318f85'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -29,21 +29,26 @@ def upgrade() -> None:
     op.create_table('subnet',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('ip', sa.String(), nullable=False),
+    sa.Column('version', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('description', sa.String(), nullable=True),
     sa.Column('location', sa.String(), nullable=True),
     sa.Column('threshold', sa.Integer(), nullable=False),
+    sa.Column('supernet', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_subnet_id'), 'subnet', ['id'], unique=False)
     op.create_index(op.f('ix_subnet_ip'), 'subnet', ['ip'], unique=False)
     op.create_index(op.f('ix_subnet_name'), 'subnet', ['name'], unique=False)
+    op.create_index(op.f('ix_subnet_version'), 'subnet', ['version'], unique=False)
     op.create_table('user',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(), nullable=False),
     sa.Column('password', sa.String(), nullable=False),
     sa.Column('email', sa.String(), nullable=False),
-    sa.Column('role', sa.String(), nullable=False),
+    sa.Column('active', sa.Boolean(), nullable=False),
+    sa.Column('operator', sa.Boolean(), nullable=False),
+    sa.Column('superuser', sa.Boolean(), nullable=False),
     sa.Column('date_created', sa.DateTime(), nullable=False),
     sa.Column('date_updated', sa.DateTime(), nullable=False),
     sa.PrimaryKeyConstraint('id')
@@ -76,6 +81,7 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_user_id'), table_name='user')
     op.drop_index(op.f('ix_user_email'), table_name='user')
     op.drop_table('user')
+    op.drop_index(op.f('ix_subnet_version'), table_name='subnet')
     op.drop_index(op.f('ix_subnet_name'), table_name='subnet')
     op.drop_index(op.f('ix_subnet_ip'), table_name='subnet')
     op.drop_index(op.f('ix_subnet_id'), table_name='subnet')

@@ -9,6 +9,7 @@ from .hosts import (
 from .subnet import (
     create_subnet,
     get_subnets,
+    get_subnets_by_version,
     get_subnet_by_id,
     get_subnet_by_name,
     delete_subnet,
