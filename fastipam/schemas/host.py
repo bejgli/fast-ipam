@@ -1,4 +1,5 @@
 from pydantic import BaseModel, validator
+from ipaddress import ip_address
 
 
 class HostBase(BaseModel):
@@ -8,6 +9,13 @@ class HostBase(BaseModel):
 
 class HostCreate(HostBase):
     subnet_id: int
+    ip: str | None = None
+
+    @validator("ip")
+    def check_ip(cls, v):
+        if v:
+            ip_address(v)
+        return v
 
 
 class HostUpdate(HostBase):
