@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from fastipam import models, crud, schemas
 from fastipam.database import SessionLocal
-from fastipam.security import SECRET_KEY, ALGORITHM
+from fastipam.config import settings
 
 
 def get_db():
@@ -25,7 +25,7 @@ def get_current_user(
     db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
 ) -> models.User:
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         token_data = schemas.TokenPayload(**payload)
     except (JWTError, ValidationError):
         raise HTTPException(
