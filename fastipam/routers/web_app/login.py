@@ -23,7 +23,7 @@ def index(
     templates: Jinja2Templates = Depends(get_templates),
     current_user: models.User = Depends(get_current_active_user),
 ):
-    context = {"request": request}
+    context = {"request": request, "user": current_user.username}
 
     return templates.TemplateResponse("index.html", context=context)
 

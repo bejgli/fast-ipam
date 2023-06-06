@@ -10,7 +10,7 @@ from fastipam import models, schemas
 
 def create_subnet(
     db: Session, subnet: schemas.SubnetCreate, subnet_version: int
-) -> models.Subnet | None:
+) -> models.Subnet:
     db_subnet = models.Subnet(**subnet.dict(), version=subnet_version)
 
     db.add(db_subnet)

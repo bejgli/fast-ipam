@@ -1,0 +1,23 @@
+{% extends "layout/base.html" %}
+{% set title = "Subnets" %}
+{% block content %}
+
+<form action="{{ url_for('create_subnet_html') }}" method="post">
+    <input type="text" name="name" id="name">
+    <input type="text" name="description" id="description">
+    <input type="text" name="location" id="location">
+    <input type="number" name="threshold" id="threshold">
+    <input type="text" name="ip" id="ip">
+    <input type="text" name="supernet" id="supernet">
+    <input type="submit" value="Create">
+</form>
+{% if not subnets %}
+    <p>No registered subnets.</p>
+{% endif %}
+<ul>
+{% for subnet in subnets %}
+    <a href="{{ url_for('get_subnet_by_id_html', id=subnet.id) }}">{{ subnet.name }}</a>
+{% endfor %}
+</ul>
+
+{% endblock %}

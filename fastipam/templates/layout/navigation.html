@@ -1,7 +1,7 @@
 <header>
     <div class="sidebar">
         <div class="flex-shrink-0 p-3 bg-white" style="width: 280px;">
-            <a href="{{ url_for("index") }}"
+            <a href="{{ url_for('index') }}"
                 class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom">
                 <svg class="bi me-2" width="30" height="24">
                     <use xlink:href="#bootstrap"></use>
@@ -11,7 +11,7 @@
             <ul class="list-unstyled ps-0">
                 <li class="mb-1">
                     <button class="btn align-items-center rounded">
-                        <a href="{{ url_for("index") }}" style="text-decoration: none; color: black;">Home</a>
+                        <a href="{{ url_for('index') }}" style="text-decoration: none; color: black;">Home</a>
                     </button>
                 </li>
                 <li class="mb-1">
@@ -35,9 +35,7 @@
                     </button>
                     <div class="collapse" id="orders-collapse">
                         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                            <li><a href="#" class="link-dark rounded mx-4">Sections</a></li>
-                            <li><a href="#" class="link-dark rounded mx-4">Subnets</a></li>
-                            <li><a href="#" class="link-dark rounded mx-4">Hosts</a></li>
+                            <li><a href="{{ url_for('get_all_subnets_html') }}" class="link-dark rounded mx-4">Subnets</a></li>
                         </ul>
                     </div>
                 </li>

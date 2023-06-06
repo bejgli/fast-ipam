@@ -14,7 +14,10 @@ def create_host(db: Session, host: schemas.HostCreate):
 
 
 def get_hosts(
-    db: Session, skip: int | None, limit: int | None, subnet_name: str | None
+    db: Session,
+    skip: int | None = None,
+    limit: int | None = None,
+    subnet_name: str | None = None,
 ):
     if subnet_name:
         db_hosts = (
