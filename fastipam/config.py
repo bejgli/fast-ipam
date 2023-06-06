@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     SQLALCHEMY_DATABASE_URL: str = Field(default="sqlite:///ipam.db")
     # TODO: db url parsing + validation
 
-    # DB_TYPE: Literal["sqlite", "mysql", "mariadb", "postgres"] = "sqlite"
+    # DB_TYPE: Literal["sqlite", "mysql", "mariadb", "postgresql"] = "sqlite"
     # DB_USER: str | None = None
     # DB_PASSWORD: str | None = None
     # DB_SERVER: str | None = None

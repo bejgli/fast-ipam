@@ -1,8 +1,8 @@
-"""subnet version, supernet
+"""Fix host ip type
 
-Revision ID: 1912ff318f85
+Revision ID: dca44e5cfe40
 Revises: 
-Create Date: 2023-06-05 18:10:33.595687
+Create Date: 2023-06-06 16:01:19.988517
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '1912ff318f85'
+revision = 'dca44e5cfe40'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -58,7 +58,7 @@ def upgrade() -> None:
     op.create_index(op.f('ix_user_username'), 'user', ['username'], unique=True)
     op.create_table('host',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('ip', sa.Integer(), nullable=False),
+    sa.Column('ip', sa.String(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('description', sa.String(), nullable=True),
     sa.Column('subnet_id', sa.Integer(), nullable=False),

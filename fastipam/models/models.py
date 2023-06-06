@@ -66,7 +66,7 @@ class Host(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 
-    ip: Mapped[int] = mapped_column(Integer, index=True) # WHAT ? INTEGER? # TODO: WTF
+    ip: Mapped[str] = mapped_column(String, index=True) # WHAT ? INTEGER? # TODO: WTF
     name: Mapped[str] = mapped_column(String, unique=True, index=True)
     description: Mapped[str | None] 
 
