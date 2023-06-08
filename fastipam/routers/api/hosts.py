@@ -45,8 +45,8 @@ def create_host(host: schemas.HostCreate, db: Session = Depends(get_db)):
         )
 
     # Get all used and valid addresses from the selected subnet
-    used_hosts = [ip_address(db_host.ip) for db_host in db_subnet.hosts]
-    valid_hosts = [host for host in ip_network(db_subnet.ip).hosts()]
+    used_hosts = (ip_address(db_host.ip) for db_host in db_subnet.hosts)
+    valid_hosts = (host for host in ip_network(db_subnet.ip).hosts())
 
     # Check if chosen IP is available
     if host.ip:
