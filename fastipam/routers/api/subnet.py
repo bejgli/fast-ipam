@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status, Body
 from sqlalchemy.orm import Session
 from ipaddress import ip_network
 
-from fastipam import crud, schemas
+from fastipam import crud, schemas, utils
 from fastipam.dependencies import get_db
 
 
@@ -31,54 +31,49 @@ def get_subnet_by_id(id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/", response_model=schemas.Subnet, status_code=201)
-def create_subnet(subnet: schemas.SubnetCreate, db: Session = Depends(get_db)):
+def create_subnet(
+    subnet: schemas.SubnetCreate,
+    reserve: int | None = Body(None, ge=0, le=5),
+    db: Session = Depends(get_db),
+):
     if crud.get_subnet_by_name(db=db, subnet_name=subnet.name):
         raise HTTPException(status_code=400, detail="Name already used")
 
     # Convert subnet into ipnetwork object for later
     subnet_netw_obj = ip_network(subnet.ip)
+
+    if reserve and subnet_netw_obj.num_addresses - reserve < 0:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Not enough address for {reserve} reserved hosts.",
+        )
+
+    db_extg_subnets = crud.get_subnets_by_version(
+        db=db, subnet_version=subnet_netw_obj.version
+    )
     if subnet.supernet:
         if not (db_supernet := crud.get_subnet_by_id(db, subnet.supernet)):
             raise HTTPException(status_code=400, detail="Supernet doesn't exist")
 
-        # Check if supernet is valid (overlaps subnet and versions match)
-        try:
-            if not (ip_network(db_supernet.ip)).supernet_of(subnet_netw_obj):  # type: ignore
-                raise HTTPException(
-                    status_code=400,
-                    detail="Selected supernet is not supernet of this subnet",
-                )
-        # TypeError happens when ip versions don't match
-        except TypeError:
-            raise HTTPException(
-                status_code=400,
-                detail="Supernet and subnet IP versions don't match",
-            )
+        utils.check_supernet_validity(ip_network(db_supernet.ip), subnet_netw_obj)
 
-    # Check for overlapping subnets excluding supernet
-    # IP versions already checked, type can be ignored
-    db_subnets = crud.get_subnets_by_version(
-        db=db, subnet_version=subnet_netw_obj.version
-    )
+        utils.check_subnet_overlap_supernet(
+            db_extg_subnets, subnet_netw_obj, db_supernet.ip
+        )
+    else:
+        utils.check_subnet_overlap(db_extg_subnets, subnet_netw_obj)
 
-    for db_subnet in db_subnets:
-        db_subnet = ip_network(db_subnet.ip)
-        if subnet.supernet:
-            if subnet_netw_obj.overlaps(db_subnet) and db_subnet != ip_network(db_supernet.ip):  # type: ignore
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Subnet conflicts with {db_subnet.exploded}",
-                )
-        else:
-            if subnet_netw_obj.overlaps(db_subnet):
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Subnet conflicts with {db_subnet.exploded}",
-                )
-
-    return crud.create_subnet(
+    db_subnet = crud.create_subnet(
         db=db, subnet=subnet, subnet_version=subnet_netw_obj.version
     )
+
+    if reserve:
+        reserved_hosts = utils.create_reserved_host_list(
+            db_subnet.id, subnet_netw_obj, reserve
+        )
+        crud.create_multiple_hosts(db=db, hosts=reserved_hosts)
+
+    return db_subnet
 
 
 @router.delete("/{id}", status_code=204)

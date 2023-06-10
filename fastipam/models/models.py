@@ -59,6 +59,10 @@ class Subnet(Base):
         back_populates="subnet",
         cascade="all, delete-orphan",
     )
+    date_created: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now)
+    date_updated: Mapped[DateTime] = mapped_column(
+        DateTime, default=datetime.now, onupdate=datetime.now
+    )
 
 
 class Host(Base):
@@ -72,3 +76,8 @@ class Host(Base):
 
     subnet_id: Mapped[int] = mapped_column(ForeignKey("subnet.id"))
     subnet: Mapped["Subnet"] = relationship(back_populates="hosts")
+
+    date_created: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now)
+    date_updated: Mapped[DateTime] = mapped_column(
+        DateTime, default=datetime.now, onupdate=datetime.now
+    )

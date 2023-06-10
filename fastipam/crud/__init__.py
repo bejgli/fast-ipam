@@ -1,5 +1,6 @@
 from .hosts import (
     create_host,
+    create_multiple_hosts,
     get_hosts,
     get_host_by_id,
     get_host_by_name,

@@ -13,6 +13,18 @@ def create_host(db: Session, host: schemas.HostCreate):
     return db_host
 
 
+def create_multiple_hosts(
+    db: Session, hosts: list[schemas.HostCreate]
+) -> list[models.Host]:
+    db_hosts = [models.Host(**host.dict()) for host in hosts]
+
+    db.add_all(db_hosts)
+    db.commit()
+    # db.refresh(db_hosts)
+
+    return db_hosts
+
+
 def get_hosts(
     db: Session,
     skip: int | None = None,
