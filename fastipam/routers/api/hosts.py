@@ -1,10 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, Response, status, Request
 from ipaddress import ip_address, ip_network
 from sqlalchemy.orm import Session
-from typing import Annotated
 
-from fastipam import crud, schemas
-from fastipam.dependencies import get_db, oauth2_scheme
+from fastipam import crud, schemas, models
+from fastipam.dependencies import (
+    get_db,
+    get_current_active_user,
+    get_current_active_opuser,
+)
 
 
 router = APIRouter(prefix="/hosts", tags=["hosts"])
@@ -18,6 +21,7 @@ def get_all_hosts(
     limit: int | None = None,
     subnet: str | None = None,
     db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_active_user),
 ):
     if not (db_hosts := crud.get_hosts(db, skip=skip, limit=limit, subnet_name=subnet)):
         response.status_code = status.HTTP_204_NO_CONTENT
@@ -27,7 +31,11 @@ def get_all_hosts(
 
 
 @router.get("/{id}", response_model=schemas.Host)
-def get_host_by_id(id: int, db: Session = Depends(get_db)):
+def get_host_by_id(
+    id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_active_user),
+):
     if not (db_host := crud.get_host_by_id(db=db, host_id=id)):
         raise HTTPException(404, detail="Address not found")
 
@@ -35,7 +43,11 @@ def get_host_by_id(id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/", response_model=schemas.Host, status_code=201)
-def create_host(host: schemas.HostCreate, db: Session = Depends(get_db)):
+def create_host(
+    host: schemas.HostCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_active_opuser),
+):
     if crud.get_host_by_name(db=db, host_name=host.name):
         raise HTTPException(status_code=400, detail="Name already used")
 
@@ -69,7 +81,11 @@ def create_host(host: schemas.HostCreate, db: Session = Depends(get_db)):
 
 
 @router.delete("/{id}", status_code=204)
-def delete_host(id: int, db: Session = Depends(get_db)):
+def delete_host(
+    id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_active_opuser),
+):
     if not crud.get_host_by_id(db=db, host_id=id):
         raise HTTPException(404, detail="Host not found")
 
@@ -77,7 +93,12 @@ def delete_host(id: int, db: Session = Depends(get_db)):
 
 
 @router.patch("/{id}", response_model=schemas.Host, status_code=200)
-def update_host(id: int, host: schemas.HostUpdate, db: Session = Depends(get_db)):
+def update_host(
+    id: int,
+    host: schemas.HostUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_active_opuser),
+):
     if not crud.get_host_by_id(db=db, host_id=id):
         raise HTTPException(404, detail="Address not found")
 

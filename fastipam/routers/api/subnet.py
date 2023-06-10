@@ -2,8 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status, Body
 from sqlalchemy.orm import Session
 from ipaddress import ip_network
 
-from fastipam import crud, schemas, utils
-from fastipam.dependencies import get_db
+from fastipam import crud, schemas, utils, models
+from fastipam.dependencies import (
+    get_db,
+    get_current_active_user,
+    get_current_active_opuser,
+)
 
 
 router = APIRouter(prefix="/subnets", tags=["subnets"])
@@ -15,6 +19,7 @@ def get_all_subnets(
     skip: int | None = 0,
     limit: int | None = 100,
     db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_active_user),
 ):
     if not (db_subnets := crud.get_subnets(db=db, skip=skip, limit=limit)):
         response.status_code = status.HTTP_204_NO_CONTENT
@@ -23,7 +28,11 @@ def get_all_subnets(
 
 
 @router.get("/{id}", response_model=schemas.Subnet)
-def get_subnet_by_id(id: int, db: Session = Depends(get_db)):
+def get_subnet_by_id(
+    id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_active_user),
+):
     if not (db_subnet := crud.get_subnet_by_id(db=db, subnet_id=id)):
         raise HTTPException(404, detail="Subnet not found")
 
@@ -35,6 +44,7 @@ def create_subnet(
     subnet: schemas.SubnetCreate,
     reserve: int | None = Body(None, ge=0, le=5),
     db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_active_opuser),
 ):
     if crud.get_subnet_by_name(db=db, subnet_name=subnet.name):
         raise HTTPException(status_code=400, detail="Name already used")
@@ -77,7 +87,11 @@ def create_subnet(
 
 
 @router.delete("/{id}", status_code=204)
-def delete_subnet(id: int, db: Session = Depends(get_db)):
+def delete_subnet(
+    id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_active_opuser),
+):
     if not crud.get_subnet_by_id(db=db, subnet_id=id):
         raise HTTPException(404, detail="Subnet not found")
 
@@ -85,7 +99,12 @@ def delete_subnet(id: int, db: Session = Depends(get_db)):
 
 
 @router.patch("/{id}", response_model=schemas.Subnet, status_code=200)
-def update_subnet(id: int, subnet: schemas.SubnetUpdate, db: Session = Depends(get_db)):
+def update_subnet(
+    id: int,
+    subnet: schemas.SubnetUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_active_opuser),
+):
     if not crud.get_subnet_by_id(db=db, subnet_id=id):
         raise HTTPException(404, detail="Subnet not found")
 

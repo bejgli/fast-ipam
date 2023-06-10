@@ -7,7 +7,6 @@ from fastipam import crud, schemas, models
 from fastipam.dependencies import (
     get_db,
     get_current_active_user,
-    get_current_active_opuser,
     get_current_active_superuser,
 )
 
