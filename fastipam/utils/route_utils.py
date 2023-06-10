@@ -74,8 +74,15 @@ def check_subnet_overlap_supernet(
     """
     for db_subnet in db_subnets:
         extg_subnet = ip_network(db_subnet.ip)
-        if new_subnet.overlaps(extg_subnet) and extg_subnet != ip_network(supernet_ip):  # type: ignore
-            return extg_subnet.exploded
+        if (
+            new_subnet.overlaps(extg_subnet)
+            and extg_subnet != ip_network(supernet_ip)
+            or new_subnet == ip_network(supernet_ip)
+        ):  # type: ignore
+            raise HTTPException(
+                status_code=400,
+                detail=f"Subnet conflicts with {extg_subnet.exploded}",
+            )
 
 
 def create_reserved_host_list(
