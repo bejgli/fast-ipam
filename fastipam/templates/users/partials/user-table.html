@@ -12,7 +12,7 @@
         {% for user in users %}
         <tr hx-target="this" hx-swap="outerHTML">
             <td>
-                <a href="{{url_for('get_user_by_id_html', id=user.id)}}">{{ user.username }}</a>
+                <a>{{ user.username }}</a>
             </td>
             <td>
                 <p>{{ user.email }}</p>

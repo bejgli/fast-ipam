@@ -5,7 +5,7 @@
 
         <li class="list-group-item"><b>Description:</b><textarea type="text" name="description" id="description" class="form-control"></textarea></li>
 
-        <input type="submit" value="Create" class="mt-3 form-control btn btn-success">
+        <input type="submit" value="Update" class="mt-3 form-control btn btn-success">
     </ul>
 </form>
     <button hx-get="{{ url_for('get_host_by_id_html', id=id)}}" hx-target="#page" hx-swap="outerHTML" class="btn btn-dark">Cancel</button>
