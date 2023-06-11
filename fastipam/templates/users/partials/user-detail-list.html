@@ -1,0 +1,12 @@
+<div hx-target="this" hx-swap="outerHTML">
+<ul class="px-2 py-3 list-group">
+    <li class="list-group-item"><b>Name:</b> {{ user.username }}</li>
+    <li class="list-group-item"><b>Email:</b> {{ user.email }}</li>
+    <li class="list-group-item"><b>Active:</b> {{ user.active }}</li>
+    <li class="list-group-item"><b>Operator</b> {{ user.operator }}</li>
+    <li class="list-group-item"><b>Superuser:</b> {{ user.superuser }}</li>
+</ul>
+
+<button hx-get="{{ url_for('update_user_me_html_view')}}"class="btn btn-dark">Edit</button>
+
+</div>

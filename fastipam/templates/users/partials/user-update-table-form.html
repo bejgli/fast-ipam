@@ -1,0 +1,26 @@
+<tr hx-target="this" hx-swap="outerHTML">
+    <form hx-patch="{{ url_for('update_user_html', id=user.id) }}">
+    <td>
+        <p>{{ user.username }}</p>
+    </td>
+    <td>
+        <p>{{ user.email }}</p>
+    </td>
+    <td>
+        <input type="checkbox" name="active" id="active" checked>
+    </td>
+    <td>
+        <input type="checkbox" name="operator" id="active">
+    </td>
+    <td>
+        <input type="checkbox" name="superuser" id="active">
+    </td>
+    <td>
+        <input type="submit" value="Update" class="btn btn-dark">
+    </td>
+    <td>
+        <button hx-get="{{ url_for('get_all_users_html') }}" hx-target="#page" hx-swap="outerHTML"
+        class="btn btn-dark">Cancel</button>
+    </td>
+    </form>
+</tr>

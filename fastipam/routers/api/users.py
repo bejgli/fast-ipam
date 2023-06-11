@@ -57,6 +57,8 @@ def update_user_me(
         user.email = email
     if password:
         user.password = password
+    else:
+        user.password = None # Különben a régi hashelt jelszó lesz az új jelszó..
 
     return crud.update_user(db=db, user=user, user_id=current_user.id)
 

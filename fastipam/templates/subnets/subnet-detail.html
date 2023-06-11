@@ -7,7 +7,26 @@
 <div class="h-25 w-50 overflow-auto mb-3 mt-3 mx-5">
     <li class="list-group-item"><b>Free address space:</b> {{ free_space }}</li>
 
-    {% include "hosts/partials/host-table.html" %}
+    <table class="table table-striped border" id="subnet-table">
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">IP address</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for host in subnet.hosts %}
+            <tr>
+                <td>
+                    <a href="{{ url_for('get_host_by_id_html', id=host.id) }}">{{ host.name }}</a>
+                </td>
+                <td>
+                    <p>{{ host.ip }}</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
 </div>
 

@@ -1,0 +1,13 @@
+{% extends "layout/base.html" %}
+{% set title = "Users" %}
+{% block content %}
+
+<h1>{{ title }}</h1>
+
+{% include "users/partials/user-form.html" %}
+
+<div class="h-25 w-100 overflow-auto mb-3 mt-3 mx-5">
+{% include "users/partials/user-table.html" %}
+</div>
+
+{% endblock %}

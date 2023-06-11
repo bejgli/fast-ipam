@@ -1,0 +1,24 @@
+<form hx-post="{{ url_for('create_user_html') }}" hx-target="#user-table" hx-swap="beforeend" 
+    class="input-group mb-3 mt-3 mx-5 border">
+    <div class="form-outline mb-4" style="width: 30vw;">
+        <label for="username" class="form-label">Username</label>
+        <input type="text" name="username" id="username" class="form-control" required>
+
+        <label for="email" class="form-label">Email</label>
+        <input type="email" name="email" id="email" class="form-control"></input>
+
+        <label for="password" class="form-label">Password</label>
+        <input type="password" name="password" id="location" class="form-control">
+
+        <label for="active" class="form-label">Active</label>
+        <input type="checkbox" name="active" id="active" checked>
+
+        <label for="operator" class="form-label">Operator</label>
+        <input type="checkbox" name="operator" id="active">
+
+        <label for="superuser" class="form-label">Superuser</label>
+        <input type="checkbox" name="superuser" id="active">
+
+        <input type="submit" value="Create" class="mt-3 form-control btn btn-success">
+    </div>
+</form>

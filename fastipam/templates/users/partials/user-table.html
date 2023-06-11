@@ -1,0 +1,45 @@
+<table class="table table-striped border" id="user-table">
+    <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Active</th>
+            <th scope="col">Operator</th>
+            <th scope="col">Superuser</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr hx-target="this" hx-swap="outerHTML">
+            <td>
+                <a href="{{url_for('get_user_by_id_html', id=user.id)}}">{{ user.username }}</a>
+            </td>
+            <td>
+                <p>{{ user.email }}</p>
+            </td>
+            <td>
+                <p>{{ user.active }}</p>
+            </td>
+            <td>
+                <p>{{ user.operator }}</p>
+            </td>
+            <td>
+                <p>{{ user.superuser }}</p>
+            </td>
+            <td>
+                <button hx-get="{{url_for('update_user_html_view', id=user.id)}}" class="btn btn-dark">Edit</button>
+            </td>
+            {% if not user.superuser %}
+            <td>
+        <button hx-delete="{{ url_for('delete_user_html', id=user.id) }}" 
+            hx-confirm="Are you sure you wish to delete user {{ user.id }}?"
+            class="btn btn-danger">
+            Delete</button>
+    
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>

@@ -37,6 +37,7 @@ web_app = FastAPI(
 web_app.include_router(routers.web_app.login.router)
 web_app.include_router(routers.web_app.subnets.router)
 web_app.include_router(routers.web_app.hosts.router)
+web_app.include_router(routers.web_app.users.router)
 
 web_app.mount("/static", StaticFiles(directory="fastipam/static"), name="static")
 

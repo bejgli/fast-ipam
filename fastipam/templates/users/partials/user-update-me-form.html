@@ -1,0 +1,12 @@
+<div hx-target="this" hx-swap="outerHTML">
+<form hx-patch="{{ url_for('update_user_me_html') }}">
+    <ul class="px-2 py-3 list-group">
+        <li class="list-group-item"><b>Name:</b><input type="text" name="username" id="username" class="form-control"></li>
+        <li class="list-group-item"><b>Email</b><input type="email" name="email" id="email" class="form-control"></li>
+        <li class="list-group-item"><b>Password:</b><input type="password" name="password" id="password" class="form-control"></li>
+        
+        <input type="submit" value="Create" class="mt-3 form-control btn btn-success">
+    </ul>
+</form>
+    <button hx-get="{{ url_for('get_user_me_html') }}" hx-target="#page" hx-swap="outerHTML" class="btn btn-dark">Cancel</button>
+</div>
