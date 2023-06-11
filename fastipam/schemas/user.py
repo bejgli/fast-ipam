@@ -14,7 +14,8 @@ class UserBase(BaseModel):
 
     @validator("email")
     def check_email(cls, v):
-        return validate_email(v, check_deliverability=False).email
+        if v:
+            return validate_email(v, check_deliverability=False).email
 
 
 class UserCreate(UserBase):
