@@ -14,7 +14,7 @@ from fastipam.security import create_access_token
 router = APIRouter(tags=["login"])
 
 
-@router.post("/token", response_model=schemas.Token)
+@router.post("/login", response_model=schemas.Token)
 def login_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: Session = Depends(get_db),

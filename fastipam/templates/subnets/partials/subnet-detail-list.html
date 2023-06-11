@@ -1,0 +1,22 @@
+<div hx-target="this" hx-swap="outerHTML">
+<ul class="px-2 py-3 list-group">
+    <li class="list-group-item"><b>ID:</b> {{ subnet.id }}</li>
+    <li class="list-group-item"><b>Name:</b> {{ subnet.name }}</li>
+    <li class="list-group-item"><b>Network address:</b> {{ subnet.ip }}</li>
+    {% if subnet.supernet %}
+    <li class="list-group-item"><b>Supernet:</b> <a href="{{ url_for('get_subnet_by_id_html', id=subnet.supernet) }}">{{
+            subnet.supernet }}</a></li>
+    {% endif %}
+    <li class="list-group-item"><b>IP version:</b> {{ subnet.version }}</li>
+    {% if subnet.description %}
+    <li class="list-group-item"><b>Description:</b> {{ subnet.description }}</li>
+    {% endif %}
+    {% if subnet.location %}
+    <li class="list-group-item"><b>Location:</b> {{ subnet.location }}</li>
+    {% endif %}
+    {% if subnet.threshold %}
+    <li class="list-group-item"><b>Threshold</b> {{ subnet.threshold }}</li>
+    {% endif %}
+</ul>
+<button hx-get="{{ url_for('update_subnet_html_view', id=subnet.id) }}"class="btn btn-dark">Edit</button>
+</div>

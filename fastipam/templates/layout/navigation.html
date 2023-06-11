@@ -24,18 +24,20 @@
                         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                             <li><a href="#" class="link-dark rounded mx-4">Users</a></li>
                             <li><a href="#" class="link-dark rounded mx-4">Settings</a></li>
-                            <li><a href="#" class="link-dark rounded mx-4">Item</a></li>
                         </ul>
                     </div>
                 </li>
                 <li class="mb-1">
                     <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"
                         data-bs-target="#orders-collapse" aria-expanded="false">
-                        IPAM
+                        Network management
                     </button>
                     <div class="collapse" id="orders-collapse">
                         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                             <li><a href="{{ url_for('get_all_subnets_html') }}" class="link-dark rounded mx-4">Subnets</a></li>
+                        </ul>
+                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                            <li><a href="{{ url_for('get_all_hosts_html') }}" class="link-dark rounded mx-4">Hosts</a></li>
                         </ul>
                     </div>
                 </li>

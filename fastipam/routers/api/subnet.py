@@ -108,7 +108,8 @@ def update_subnet(
     if not crud.get_subnet_by_id(db=db, subnet_id=id):
         raise HTTPException(404, detail="Subnet not found")
 
-    # Unique name check
+    
+    #TODO: can't change to same name
     if subnet.name and crud.get_subnet_by_name(db=db, subnet_name=subnet.name):
         raise HTTPException(status_code=400, detail="Name already used")
 

@@ -20,8 +20,8 @@ def get_db():
     finally:
         db.close()
 
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+# TODO: web_app routes use different url
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
 def get_current_user(

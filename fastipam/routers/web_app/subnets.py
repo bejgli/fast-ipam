@@ -1,18 +1,19 @@
 from fastapi import APIRouter, Request, Depends, Response, status, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.exceptions import HTTPException
 
 from sqlalchemy.orm import Session
 
-from typing import Annotated
-from datetime import timedelta
-from ipaddress import ip_network, ip_address
+from ipaddress import ip_network
 
-from fastipam import crud, schemas, models
-from fastipam.dependencies import get_templates, get_db, get_current_active_user
-from fastipam.security import create_access_token
+from fastipam import crud, schemas, models, utils
+from fastipam.dependencies import (
+    get_templates,
+    get_db,
+    get_current_active_user,
+    get_current_active_opuser,
+)
 
 
 router = APIRouter(tags=["subnets"], prefix="/subnets")
@@ -26,7 +27,7 @@ def get_all_subnets_html(
     limit: int | None = 100,
     db: Session = Depends(get_db),
     templates: Jinja2Templates = Depends(get_templates),
-    # current_user: models.User = Depends(get_current_active_user),
+    current_user: models.User = Depends(get_current_active_user),
 ):
     if not (db_subnets := crud.get_subnets(db=db, skip=skip, limit=limit)):
         response.status_code = status.HTTP_204_NO_CONTENT
@@ -44,82 +45,188 @@ def get_subnet_by_id_html(
     id: int,
     db: Session = Depends(get_db),
     templates: Jinja2Templates = Depends(get_templates),
-    # current_user: models.User = Depends(get_current_active_user),
+    current_user: models.User = Depends(get_current_active_user),
 ):
     if not (db_subnet := crud.get_subnet_by_id(db=db, subnet_id=id)):
         raise HTTPException(404, detail="Subnet not found")
 
     subnet = schemas.Subnet(**db_subnet.__dict__)
-    # Hosts need to be saved separately, because db_subnet.__dict__ converting them.
-    used_hosts = [schemas.Host(**host.__dict__) for host in db_subnet.hosts]
-    valid_hosts = [host for host in ip_network(db_subnet.ip).hosts()]
+    # Hosts need to be saved separately, because db_subnet.__dict__ is removing them.
+    subnet.hosts = [schemas.Host(**host.__dict__) for host in db_subnet.hosts]
 
-    free_space = len(valid_hosts) - len(used_hosts)
+    free_space = ip_network(db_subnet.ip).num_addresses - len(subnet.hosts)
 
     context = {
         "request": request,
         "subnet": subnet,
         "free_space": free_space,
-        "used_hosts": used_hosts,
     }
 
-    return templates.TemplateResponse("subnets/subnet_detail.html", context=context)
+    return templates.TemplateResponse("subnets/subnet-detail.html", context=context)
 
 
-#@router.post("/", response_class=HTMLResponse, status_code=201)
-#def create_subnet_html(
-#    request: Request,
-#    subnet: Annotated[schemas.SubnetCreate, Form()],
-#    db: Session = Depends(get_db),
-#):
-#    if crud.get_subnet_by_name(db=db, subnet_name=subnet.name):
-#        raise HTTPException(status_code=400, detail="Name already used")
-#
-#    # Convert subnet into ipnetwork object for later
-#    subnet_netw_obj = ip_network(subnet.ip)
-#    if subnet.supernet:
-#        if not (db_supernet := crud.get_subnet_by_id(db, subnet.supernet)):
-#            raise HTTPException(status_code=400, detail="Supernet doesn't exist")
-#
-#        # Check if supernet is valid (overlaps subnet and versions match)
-#        try:
-#            if not (ip_network(db_supernet.ip)).supernet_of(subnet_netw_obj):  # type: ignore
-#                raise HTTPException(
-#                    status_code=400,
-#                    detail="Selected supernet is not supernet of this subnet",
-#                )
-#        # TypeError happens when ip versions don't match
-#        except TypeError:
-#            raise HTTPException(
-#                status_code=400,
-#                detail="Supernet and subnet IP versions don't match",
-#            )
-#
-#    # Check for overlapping subnets excluding supernet
-#    # IP versions already checked, type can be ignored
-#    db_subnets = crud.get_subnets_by_version(
-#        db=db, subnet_version=subnet_netw_obj.version
-#    )
-#
-#    for db_subnet in db_subnets:
-#        db_subnet = ip_network(db_subnet.ip)
-#        if subnet.supernet:
-#            if subnet_netw_obj.overlaps(db_subnet) and db_subnet != ip_network(db_supernet.ip):  # type: ignore
-#                raise HTTPException(
-#                    status_code=400,
-#                    detail=f"Subnet conflicts with {db_subnet.exploded}",
-#                )
-#        else:
-#            if subnet_netw_obj.overlaps(db_subnet):
-#                raise HTTPException(
-#                    status_code=400,
-#                    detail=f"Subnet conflicts with {db_subnet.exploded}",
-#                )
-#
-#    new_db_subnet = crud.create_subnet(
-#        db=db, subnet=subnet, subnet_version=subnet_netw_obj.version
-#    )
-#    return RedirectResponse(
-#        router.url_path_for("get_subnet_by_id_html", id=new_db_subnet.id),
-#        status_code=303,
-#    )
+@router.post("/", response_class=HTMLResponse, status_code=201)
+def create_subnet_html(
+    request: Request,
+    name: str = Form(),
+    description: str | None = Form(None),
+    location: str | None = Form(None),
+    threshold: int = Form(0),
+    ip: str = Form(),
+    supernet: int | None = Form(None),
+    reserve: int | None = Form(None, ge=0, le=5),
+    db: Session = Depends(get_db),
+    templates: Jinja2Templates = Depends(get_templates),
+    current_user: models.User = Depends(get_current_active_opuser),
+):
+    subnet = schemas.SubnetCreate(
+        name=name,
+        description=description,
+        location=location,
+        threshold=threshold,
+        ip=ip,
+        supernet=supernet,
+    )
+
+    if crud.get_subnet_by_name(db=db, subnet_name=subnet.name):
+        raise HTTPException(status_code=400, detail="Name already used")
+
+    # Convert subnet into ipnetwork object for later
+    subnet_netw_obj = ip_network(subnet.ip)
+
+    if reserve and subnet_netw_obj.num_addresses - reserve < 0:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Not enough address for {reserve} reserved hosts.",
+        )
+
+    db_extg_subnets = crud.get_subnets_by_version(
+        db=db, subnet_version=subnet_netw_obj.version
+    )
+    if subnet.supernet:
+        if not (db_supernet := crud.get_subnet_by_id(db, subnet.supernet)):
+            raise HTTPException(status_code=400, detail="Supernet doesn't exist")
+
+        utils.check_supernet_validity(ip_network(db_supernet.ip), subnet_netw_obj)
+
+        utils.check_subnet_overlap_supernet(
+            db_extg_subnets, subnet_netw_obj, db_supernet.ip
+        )
+    else:
+        utils.check_subnet_overlap(db_extg_subnets, subnet_netw_obj)
+
+    db_subnet = crud.create_subnet(
+        db=db, subnet=subnet, subnet_version=subnet_netw_obj.version
+    )
+
+    if reserve:
+        reserved_hosts = utils.create_reserved_host_list(
+            db_subnet.id, subnet_netw_obj, reserve
+        )
+        crud.create_multiple_hosts(db=db, hosts=reserved_hosts)
+
+    # TODO: this is unnecessary info for the post, only id, name and ip is used
+    # hosts could take a long time to create list of
+    # context should be used directly
+    subnet = schemas.Subnet(
+        id=db_subnet.id,
+        name=db_subnet.name,
+        ip=db_subnet.ip,
+        description=db_subnet.description,
+        location=db_subnet.location,
+        threshold=db_subnet.threshold,
+        supernet=db_subnet.supernet,
+        version=db_subnet.version,
+        hosts=[schemas.Host(**host.__dict__) for host in db_subnet.hosts],
+    )
+
+    context = {
+        "request": request,
+        "subnet": subnet,
+    }
+    return templates.TemplateResponse(
+        "subnets/partials/subnet-table-row.html", context=context
+    )
+
+
+@router.delete("/{id}", response_class=HTMLResponse)
+def delete_subnet_html(
+    id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_active_opuser),
+):
+    if not crud.get_subnet_by_id(db=db, subnet_id=id):
+        raise HTTPException(404, detail="Subnet not found")
+
+    crud.delete_subnet(db=db, subnet_id=id)
+
+    response = RedirectResponse(
+        router.url_path_for("get_all_subnets_html"),
+        status_code=200,
+        headers={"HX-Redirect": router.url_path_for("get_all_subnets_html")}
+    )
+
+    return response
+
+
+@router.get("/{id}/update", response_class=HTMLResponse, status_code=200)
+def update_subnet_html_view(
+    request: Request,
+    id: int,
+    db: Session = Depends(get_db),
+    templates: Jinja2Templates = Depends(get_templates),
+    current_user: models.User = Depends(get_current_active_opuser),
+):
+    if not crud.get_subnet_by_id(db=db, subnet_id=id):
+        raise HTTPException(404, detail="Subnet not found")
+
+    context = {
+        "request": request,
+        "id": id,
+    }
+
+    return templates.TemplateResponse(
+        "subnets/partials/subnet-update-form.html", context=context
+    )
+
+
+@router.patch("/{id}", response_class=HTMLResponse, status_code=200)
+def update_subnet_html(
+    request: Request,
+    id: int,
+    db: Session = Depends(get_db),
+    name: str | None = Form(None),
+    description: str | None = Form(None),
+    location: str | None = Form(None),
+    threshold: int = Form(0),
+    templates: Jinja2Templates = Depends(get_templates),
+    current_user: models.User = Depends(get_current_active_opuser),
+):
+
+    subnet = schemas.SubnetUpdate(
+        name=name,
+        description=description,
+        location=location,
+        threshold=threshold,
+    )
+
+    if not crud.get_subnet_by_id(db=db, subnet_id=id):
+        raise HTTPException(404, detail="Subnet not found")
+
+    #TODO: can't change to same name
+    if subnet.name and crud.get_subnet_by_name(db=db, subnet_name=subnet.name):
+        raise HTTPException(status_code=400, detail="Name already used")
+
+    db_subnet = crud.update_subnet(db=db, subnet_id=id, subnet=subnet)
+
+    subnet_updated = schemas.Subnet(**db_subnet.__dict__)
+
+    context = {
+        "request": request,
+        "subnet": subnet_updated,
+    }
+
+    return templates.TemplateResponse(
+        "subnets/partials/subnet-detail-list.html", context=context
+    )
+

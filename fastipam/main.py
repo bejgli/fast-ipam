@@ -3,6 +3,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.exceptions import RequestValidationError, HTTPException
 
+# from fastapi.exception_handlers import request_validation_exception_handler
+from pydantic import ValidationError
+
 import pathlib
 
 from fastipam import routers
@@ -32,6 +35,7 @@ web_app = FastAPI(
 
 web_app.include_router(routers.web_app.login.router)
 web_app.include_router(routers.web_app.subnets.router)
+web_app.include_router(routers.web_app.hosts.router)
 
 web_app.mount("/static", StaticFiles(directory="fastipam/static"), name="static")
 
@@ -41,8 +45,21 @@ template_dir = (pathlib.Path(__file__).parent).joinpath("templates")
 templates = Jinja2Templates(directory=template_dir)
 
 
+@web_app.exception_handler(ValidationError)
+async def html_form_validation_exception_handler(
+    request: Request,
+    exc: ValidationError,
+    templates: Jinja2Templates = templates,
+):
+    context = {"request": request, "error": exc.errors()}
+
+    return templates.TemplateResponse(
+        "errors/partials/error.html", context=context, status_code=422
+    )
+
+
 @web_app.exception_handler(RequestValidationError)
-def html_validation_exception_handler(
+def html_request_validation_exception_handler(
     request: Request,
     exc: RequestValidationError,
     templates: Jinja2Templates = templates,
@@ -50,7 +67,7 @@ def html_validation_exception_handler(
     context = {"request": request, "error": exc.errors()}
 
     return templates.TemplateResponse(
-        "errors/validation_error.html", context=context, status_code=422
+        "errors/partials/error.html", context=context, status_code=422
     )
 
 
@@ -62,9 +79,27 @@ def html_http_exception_handler(
 ):
     context = {"request": request, "error": exc.detail}
 
-    return templates.TemplateResponse(
-        "errors/validation_error.html", context=context, status_code=exc.status_code
-    )
+    match exc.status_code:
+        case 401:
+            return templates.TemplateResponse(
+                "login.html", context=context, status_code=exc.status_code
+            )
+        case 403:
+            return templates.TemplateResponse(
+                "login.html", context=context, status_code=exc.status_code
+            )
+        case 400:
+            return templates.TemplateResponse(
+                "errors/partials/error.html",
+                context=context,
+                status_code=exc.status_code,
+            )
+        case _:
+            return templates.TemplateResponse(
+                "errors/partials/error.html",
+                context=context,
+                status_code=exc.status_code,
+            )
 
 
 @web_app.middleware("http")
@@ -81,6 +116,7 @@ async def add_auth_header(request: Request, call_next):
     response = await call_next(request)
 
     return response
+
 
 # Full application
 app = FastAPI(
