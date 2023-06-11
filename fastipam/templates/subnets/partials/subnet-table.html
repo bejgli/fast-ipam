@@ -1,0 +1,21 @@
+<table class="table table-striped border" id="subnet-table">
+    <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Network address</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for subnet in subnets %}
+        <tr>
+            <td>
+                <a href="{{ url_for('get_subnet_by_id_html', id=subnet.id) }}">{{ subnet.name }}</a>
+            </td>
+            <td>
+                <p>{{ subnet.ip }}</p>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>

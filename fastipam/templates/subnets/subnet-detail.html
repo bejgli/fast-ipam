@@ -1,0 +1,23 @@
+{% extends "layout/base.html" %}
+{% set title = "Subnet details" %}
+{% block content %}
+
+{% include "subnets/partials/subnet-detail-list.html" %}
+
+<div class="h-25 w-50 overflow-auto mb-3 mt-3 mx-5">
+    <li class="list-group-item"><b>Free address space:</b> {{ free_space }}</li>
+
+    {% include "hosts/partials/host-table.html" %}
+
+</div>
+
+<div class="mb-3 mt-3 mx-5">
+<button hx-delete="{{ url_for('delete_subnet_html', id=subnet.id) }}" 
+    hx-swap="none"
+    hx-confirm="Are you sure you wish to delete subnet {{ subnet.id }}?"
+    class="btn btn-danger">
+    Delete</button>
+</div>
+
+
+{% endblock %}

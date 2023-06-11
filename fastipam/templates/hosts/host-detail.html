@@ -1,0 +1,15 @@
+{% extends "layout/base.html" %}
+{% set title = "Host details" %}
+{% block content %}
+
+{% include "hosts/partials/host-detail-list.html" %}
+
+<div class="mb-3 mt-3 mx-5">
+<button hx-delete="{{ url_for('delete_host_html', id=host.id) }}" 
+    hx-swap="none"
+    hx-confirm="Are you sure you wish to delete host {{ host.id }}?"
+    class="btn btn-danger">
+    Delete</button>
+</div>
+
+{% endblock %}

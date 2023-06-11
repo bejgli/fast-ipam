@@ -1,0 +1,13 @@
+<div hx-target="this" hx-swap="outerHTML">
+<ul class="px-2 py-3 list-group">
+    <li class="list-group-item"><b>ID:</b> {{ host.id }}</li>
+    <li class="list-group-item"><b>Name:</b> {{ host.name }}</li>
+    <li class="list-group-item"><b>IP address:</b> {{ host.ip }}</li>
+    <li class="list-group-item"><b>Subnet:</b><a href="{{ url_for('get_subnet_by_id_html', id=host.subnet_id) }}"></a> {{ host.subnet_id }}</li>
+    {% if host.description %}
+    <li class="list-group-item"><b>Description:</b> {{ host.description }}</li>
+    {% endif %}
+</ul>
+
+<button hx-get="{{ url_for('update_host_html_view', id=host.id) }}"class="btn btn-dark">Edit</button>
+</div>

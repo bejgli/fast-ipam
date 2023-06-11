@@ -1,0 +1,18 @@
+
+<div hx-target="this" hx-swap="outerHTML">
+<form hx-patch="{{ url_for('update_subnet_html', id=id)}}">
+    <ul class="px-2 py-3 list-group">
+        <li class="list-group-item"><b>Name:</b><input type="text" name="name" id="name" class="form-control"></li>
+
+        <li class="list-group-item"><b>Description:</b><textarea type="text" name="description" id="description" class="form-control"></textarea></li>
+
+        <li class="list-group-item"><b>Location:</b><input type="text" name="location" id="location" class="form-control"></li>
+
+        
+        <li class="list-group-item"><b>Threshold:</b><input type="number" name="threshold" id="threshold" class="form-control" value="0" min="0" max="100"></li>
+
+        <input type="submit" value="Create" class="mt-3 form-control btn btn-success">
+    </ul>
+</form>
+    <button hx-get="{{ url_for('get_subnet_by_id_html', id=id)}}" hx-target="#page" hx-swap="outerHTML" class="btn btn-dark">Cancel</button>
+</div>

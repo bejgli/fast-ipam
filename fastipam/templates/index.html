@@ -1,0 +1,18 @@
+{% extends "layout/base.html" %}
+{% set title = "Home" %}
+{% block content %}
+
+<main class="bd-main col-lg-6">
+    <h1 class="main-title py-4" style="font-size: 1.5rem">Hello <b>{{ user }}</b></h1>
+</main>
+
+<div class="col-lg-3 px-5" style="padding-top: 120px;">
+    <div class="card">
+        <h5 class="card-header">Log</h5>
+        <div class="card-body">
+            <p class="card-text">Future log</p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

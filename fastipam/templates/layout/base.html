@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ title }}</title>
+
+    <link href="{{ url_for('static', path='/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', path='/style.css') }}" rel="stylesheet">
+</head>
+
+<body id="page" class="d-flex justify-content-start">
+    {% if title != "Login" %}
+    {% include "layout/navigation.html" %}
+    {% endif %}
+
+    {% block content %}{% endblock content %}
+
+    <div id="errors"></div>
+</body>
+
+<script src="{{ url_for('static', path='/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ url_for('static', path='/htmx.min.js') }}"></script>
+<script src="{{ url_for('static', path='/events.js') }}"></script>
+
+</html>

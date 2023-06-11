@@ -1,0 +1,27 @@
+<form hx-post="{{ url_for('create_subnet_html') }}" hx-target="#subnet-table" hx-swap="beforeend" 
+    class="input-group mb-3 mt-3 mx-5 border">
+    <div class="form-outline mb-4" style="width: 30vw;">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" name="name" id="name" class="form-control" required>
+
+        <label for="description" class="form-label">Description</label>
+        <textarea type="text" name="description" id="description" class="form-control"></textarea>
+
+        <label for="location" class="form-label">Location</label>
+        <input type="text" name="location" id="location" class="form-control">
+
+        <label for="threshold" class="form-label">Threshold</label>
+        <input type="number" name="threshold" id="threshold" class="form-control" value="0" min="0" max="100">
+
+        <label for="ip" class="form-label">Network Address (CIDR)</label>
+        <input type="text" name="ip" id="ip" class="form-control" required>
+
+        <label for="supernet" class="form-label">Supernet ID</label>
+        <input type="number" name="supernet" id="supernet" class="form-select">
+
+        <label for="reserve" class="form-label">Reserve first <i>n</i> hosts</label>
+        <input type="number" name="reserve" id="reserve" class="form-control" value="0" min="0" max="5">
+
+        <input type="submit" value="Create" class="mt-3 form-control btn btn-success">
+    </div>
+</form>
