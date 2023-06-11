@@ -6,38 +6,15 @@
 
 <div class="h-25 w-50 overflow-auto mb-3 mt-3 mx-5">
     <li class="list-group-item"><b>Free address space:</b> {{ free_space }}</li>
-    <table class="table table-striped border" id="subnet-table">
-        <thead>
-            <tr>
-                <th scope="col">Name</th>
-                <th scope="col">IP address</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for host in subnet.hosts %}
-            <tr>
-                <td>
-                    <a href=>{{ host.name }}</a>
-                </td>
-                <td>
-                    <p>{{ host.ip }}</p>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+
+    {% include "hosts/partials/host-table.html" %}
+
 </div>
 
-<!--
-Full page reload. Using htmx for delete method.
-    hx-target="#page" 
-    hx-swap="none"
-    hx-replace-url="true" 
--->
 <div class="mb-3 mt-3 mx-5">
 <button hx-delete="{{ url_for('delete_subnet_html', id=subnet.id) }}" 
     hx-swap="none"
-    hx-confirm="Are you sure you wish to delete your account?"
+    hx-confirm="Are you sure you wish to delete subnet {{ subnet.id }}?"
     class="btn btn-danger">
     Delete</button>
 </div>

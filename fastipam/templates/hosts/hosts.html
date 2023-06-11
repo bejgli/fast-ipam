@@ -1,13 +1,13 @@
 {% extends "layout/base.html" %}
-{% set title = "Subnets" %}
+{% set title = "Hosts" %}
 {% block content %}
 
 <h1>{{ title }}</h1>
 
-{% include "subnets/partials/subnet-form.html" %}
+{% include "hosts/partials/host-form.html" %}
 
 <div class="h-25 w-100 overflow-auto mb-3 mt-3 mx-5">
-{% include "subnets/partials/subnet-table.html" %}
+{% include "hosts/partials/host-table.html" %}
 </div>
 
 {% endblock %}

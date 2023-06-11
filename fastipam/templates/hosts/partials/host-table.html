@@ -1,0 +1,21 @@
+<table class="table table-striped border" id="host-table">
+    <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">IP address</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for host in hosts %}
+        <tr>
+            <td>
+                <a href="{{ url_for('get_host_by_id_html', id=host.id) }}">{{ host.name }}</a>
+            </td>
+            <td>
+                <p>{{ host.ip }}</p>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
