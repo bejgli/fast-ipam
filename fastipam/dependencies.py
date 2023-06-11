@@ -56,7 +56,7 @@ def get_current_active_user(
 def get_current_active_opuser(
     current_user: models.User = Depends(get_current_active_user),
 ) -> models.User:
-    if not current_user.operator or not current_user.superuser:
+    if not current_user.operator and not current_user.superuser:
         raise HTTPException(
             status_code=403,
             detail="Insufficient privileges. Operator permission required.",
