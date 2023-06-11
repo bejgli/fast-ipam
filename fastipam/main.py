@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.exceptions import RequestValidationError, HTTPException
@@ -81,19 +82,18 @@ def html_http_exception_handler(
 
     match exc.status_code:
         case 401:
-            return templates.TemplateResponse(
-                "login.html", context=context, status_code=exc.status_code
-            )
-        case 403:
-            return templates.TemplateResponse(
-                "login.html", context=context, status_code=exc.status_code
-            )
-        case 400:
-            return templates.TemplateResponse(
-                "errors/partials/error.html",
-                context=context,
-                status_code=exc.status_code,
-            )
+            if request.headers.get("HX-Request"):
+                response = RedirectResponse(
+                    web_app.url_path_for("login"),
+                    status_code=401,
+                    headers={"HX-Redirect": web_app.url_path_for("login")},
+                )
+            else:
+                response = RedirectResponse(
+                    web_app.url_path_for("login"),
+                    status_code=303,
+                )
+            return response
         case _:
             return templates.TemplateResponse(
                 "errors/partials/error.html",
