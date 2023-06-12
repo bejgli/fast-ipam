@@ -1,6 +1,5 @@
 # Szakdolgozat munka
-## ZNDJKD
-### IPAM alkalmazás tervezése és fejlesztése
+## Torhosi László - ZNDJKD - IPAM alkalmazás tervezése és fejlesztése
 
 ## Telepítés:
 
