@@ -17,9 +17,11 @@ class User(Base):
     active: Mapped[bool] = mapped_column(Boolean, default=True)
     operator: Mapped[bool] = mapped_column(Boolean, default=False)
     superuser: Mapped[bool] = mapped_column(Boolean, default=False)
-    date_created: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now)
+    date_created: Mapped[DateTime] = mapped_column(
+        DateTime, default=datetime.now, nullable=True
+    )
     date_updated: Mapped[DateTime] = mapped_column(
-        DateTime, default=datetime.now, onupdate=datetime.now
+        DateTime, default=datetime.now, onupdate=datetime.now, nullable=True
     )
 
 
@@ -51,7 +53,7 @@ class Subnet(Base):
     version: Mapped[int] = mapped_column(Integer, index=True)
     name: Mapped[str] = mapped_column(String, unique=False, index=True)
     description: Mapped[str | None]
-    location: Mapped[str | None] 
+    location: Mapped[str | None]
     threshold: Mapped[int] = mapped_column(Integer)
     supernet: Mapped[int | None] = mapped_column(Integer)
 
@@ -59,9 +61,11 @@ class Subnet(Base):
         back_populates="subnet",
         cascade="all, delete-orphan",
     )
-    date_created: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now)
+    date_created: Mapped[DateTime] = mapped_column(
+        DateTime, default=datetime.now, nullable=True
+    )
     date_updated: Mapped[DateTime] = mapped_column(
-        DateTime, default=datetime.now, onupdate=datetime.now
+        DateTime, default=datetime.now, onupdate=datetime.now, nullable=True
     )
 
 
@@ -72,12 +76,14 @@ class Host(Base):
 
     ip: Mapped[str] = mapped_column(String, index=True)
     name: Mapped[str] = mapped_column(String, unique=True, index=True)
-    description: Mapped[str | None] 
+    description: Mapped[str | None]
 
     subnet_id: Mapped[int] = mapped_column(ForeignKey("subnet.id"))
     subnet: Mapped["Subnet"] = relationship(back_populates="hosts")
 
-    date_created: Mapped[DateTime] = mapped_column(DateTime, default=datetime.now)
+    date_created: Mapped[DateTime] = mapped_column(
+        DateTime, default=datetime.now, nullable=True
+    )
     date_updated: Mapped[DateTime] = mapped_column(
-        DateTime, default=datetime.now, onupdate=datetime.now
+        DateTime, default=datetime.now, onupdate=datetime.now, nullable=True
     )

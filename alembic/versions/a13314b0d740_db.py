@@ -1,8 +1,8 @@
-"""Fix host ip type
+"""db
 
-Revision ID: dca44e5cfe40
+Revision ID: a13314b0d740
 Revises: 
-Create Date: 2023-06-06 16:01:19.988517
+Create Date: 2023-06-12 10:31:57.584087
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'dca44e5cfe40'
+revision = 'a13314b0d740'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -35,6 +35,8 @@ def upgrade() -> None:
     sa.Column('location', sa.String(), nullable=True),
     sa.Column('threshold', sa.Integer(), nullable=False),
     sa.Column('supernet', sa.Integer(), nullable=True),
+    sa.Column('date_created', sa.DateTime(), nullable=True),
+    sa.Column('date_updated', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_subnet_id'), 'subnet', ['id'], unique=False)
@@ -49,8 +51,8 @@ def upgrade() -> None:
     sa.Column('active', sa.Boolean(), nullable=False),
     sa.Column('operator', sa.Boolean(), nullable=False),
     sa.Column('superuser', sa.Boolean(), nullable=False),
-    sa.Column('date_created', sa.DateTime(), nullable=False),
-    sa.Column('date_updated', sa.DateTime(), nullable=False),
+    sa.Column('date_created', sa.DateTime(), nullable=True),
+    sa.Column('date_updated', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_user_email'), 'user', ['email'], unique=True)
@@ -62,6 +64,8 @@ def upgrade() -> None:
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('description', sa.String(), nullable=True),
     sa.Column('subnet_id', sa.Integer(), nullable=False),
+    sa.Column('date_created', sa.DateTime(), nullable=True),
+    sa.Column('date_updated', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['subnet_id'], ['subnet.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
