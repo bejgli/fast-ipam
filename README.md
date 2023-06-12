@@ -1,7 +1,7 @@
 # Szakdolgozat munka
 ## Torhosi László - ZNDJKD - IPAM alkalmazás tervezése és fejlesztése
 
-## Telepítés:
+## Telepítés manuálisan:
 
 ### clone repository
 ```
@@ -57,6 +57,27 @@ uvicorn fastipam.main:app
 alap port: 8000
 
 további szerver beállítások: https://www.uvicorn.org/deployment/
+
+
+## Telepítés containerként:
+### clone repository
+```
+git clone https://github.com/bejgli/fast-ipam.git
+```
+
+```
+cd fast-ipam
+```
+
+### container
+```
+podman build -t ipam 
+```
+
+```
+podman run -d -p 8000:80 <CONTAINER-ID>
+```
+
 
 ## Használat
 ### Web app
