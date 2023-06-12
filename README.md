@@ -85,8 +85,12 @@ podman run -d -p 8000:80 <CONTAINER-ID>
 - bejelentkezés az alap felhasználóval
 - Admin/Users menüpont -> Felhasználók létrehozása, törlése, jogosultságok módosítása
 - Network management/Subnets menüpont -> hálózatok létrehozása, módosítása, törlése
+  - Kötelező mezők: name, ip
 - Network management/Hosts menüpont -> hostok létrehozása, módosítása, törlése
+  - Kötelező mezők: name, subnet id
+  - Amennyiben nem adunk meg IP címet, a program automatikusan a legelső elérhetőt választja
 - Account/Me menüpont -> saját név, email, jelszó módosítása
+  - Az üresen hagyot mezők nem frissülnek
 - Account/Logout -> kijelentkezés
 ### API
 - localhost:8000/api
