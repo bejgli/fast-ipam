@@ -1,11 +1,13 @@
-FROM python:3.11
+FROM python:slim-buster
 
-WORKDIR /code
+WORKDIR /
 
-COPY ./requirements/prod.txt /code/requirements.txt
+COPY ./ /ipam/
 
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+RUN pip install --no-cache-dir --upgrade -r /ipam/requirements/dev.txt
 
-COPY ./app/ /code/app
+WORKDIR /ipam
+
+RUN ./init_app.sh
 
 CMD ["uvicorn", "fastipam.main:app", "--host=0.0.0.0", "--port=80"]
