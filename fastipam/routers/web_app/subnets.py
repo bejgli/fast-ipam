@@ -54,6 +54,7 @@ def get_subnet_by_id_html(
     # Hosts need to be saved separately, because db_subnet.__dict__ is removing them.
     subnet.hosts = [schemas.Host(**host.__dict__) for host in db_subnet.hosts]
 
+    #TODO: This includes netw and broadcast addr atm..
     free_space = ip_network(db_subnet.ip).num_addresses - len(subnet.hosts)
 
     context = {
