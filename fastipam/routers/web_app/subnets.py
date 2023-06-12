@@ -50,6 +50,7 @@ def get_subnet_by_id_html(
     if not (db_subnet := crud.get_subnet_by_id(db=db, subnet_id=id)):
         raise HTTPException(404, detail="Subnet not found")
 
+    # TODO: change __dict__ to jsonable_encoder!
     subnet = schemas.Subnet(**db_subnet.__dict__)
     # Hosts need to be saved separately, because db_subnet.__dict__ is removing them.
     subnet.hosts = [schemas.Host(**host.__dict__) for host in db_subnet.hosts]

@@ -118,5 +118,4 @@ def update_user(
     if user.email and crud.get_user_by_email(db=db, email=user.email):
         raise HTTPException(status_code=400, detail="Email already registered.")
 
-    # TODO: ha a crud functionök elfogadnak db obejtet, akkor elég egy query
     return crud.update_user(db=db, user_id=id, user=user)

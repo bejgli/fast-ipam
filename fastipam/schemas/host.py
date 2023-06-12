@@ -31,4 +31,3 @@ class Host(HostBase):
         orm_mode = True
 
 
-# TODO: validation, create host with specified address.

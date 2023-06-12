@@ -4,7 +4,6 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.exceptions import RequestValidationError, HTTPException
 
-# from fastapi.exception_handlers import request_validation_exception_handler
 from pydantic import ValidationError
 
 import pathlib
@@ -32,6 +31,9 @@ web_app = FastAPI(
     title="IPAM web app",
     description=description,
     version=version,
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
 )
 
 web_app.include_router(routers.web_app.login.router)
