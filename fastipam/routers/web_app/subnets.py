@@ -127,7 +127,8 @@ def create_subnet_html(
         )
         crud.create_multiple_hosts(db=db, hosts=reserved_hosts)
 
-    # TODO: this is unnecessary info for the post, only id, name and ip is used
+    # TODO: remove unnecessary info for the post, 
+    # only id, name and ip is used
     # hosts could take a long time to create list of
     # context should be used directly
     subnet = schemas.Subnet(
